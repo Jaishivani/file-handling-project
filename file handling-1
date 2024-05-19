@@ -1,0 +1,66 @@
+import random
+GRADE_POINTS = {
+    'O': 10,
+    'A': 9,
+    'B': 8,
+    'C': 7,
+    'D': 6,
+    'U': 0
+}
+
+students = []
+for i in range(1, 31):
+    name = f'Student{i:02d}'
+    register_number = f'R{i:03d}'
+    grades = [random.choice(list(GRADE_POINTS.keys())) for _ in range(5)]
+    total_marks = sum(GRADE_POINTS[grade] for grade in grades)
+    percentage = (total_marks / 50) * 100
+    students.append((name, register_number, grades, total_marks, percentage))
+
+with open('result.txt', 'w') as file:
+    for student in students:
+        file.write(f"{student[0]},{student[1]},{','.join(student[2])},{student[3]},{student[4]:.2f}\n")
+
+print("Contents of the result file:")
+with open('result.txt', 'r') as file:
+    content = file.read()
+    print(content)
+
+
+categories = {
+    '90% and above': [],
+    '80% and below 90%': [],
+    '70% and below 80%': [],
+    'below 70%': [],
+    'arrear': []
+}
+
+with open('result.txt', 'r') as file:
+    lines = file.readlines()
+
+for line in lines:
+    name, reg_no, *grades, total_marks, percentage = line.strip().split(',')
+    percentage = float(percentage)
+    total_marks = int(total_marks)
+    if 'U' in grades:
+        categories['arrear'].append((name, reg_no, percentage))
+    elif percentage >= 90:
+        categories['90% and above'].append((name, reg_no, percentage))
+    elif percentage >= 80:
+        categories['80% and below 90%'].append((name, reg_no, percentage))
+    elif percentage >= 70:
+        categories['70% and below 80%'].append((name, reg_no, percentage))
+    else:
+        categories['below 70%'].append((name, reg_no, percentage))
+
+with open('analysis.txt', 'w') as file:
+    for category, students in categories.items():
+        file.write(f"{category}:\n")
+        for student in students:
+            file.write(f"{student[0]}, {student[1]}, {student[2]:.2f}\n")
+        file.write("\n")
+
+print("\nContents of the analysis file:")
+with open('analysis.txt', 'r') as file:
+    analysis_content = file.read()
+    print(analysis_content)
